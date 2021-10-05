@@ -46,8 +46,6 @@ sqrt(2918)
 library(class)
 help("knn") # Read the knn documentation on RStudio.
 KNNpred <- knn(train = KNNtrain[1:7], test = KNNtest[1:7], cl = KNNtrain$rings, k = 55)
-KNNpred
-table(KNNpred)
 
 # iris dataset is from UCI ML repository.
 # kmeans clustering example from Rpubs by RStudio: https://rpubs.com/AnanyaDu/361293
