@@ -16,6 +16,7 @@ minprice<-10000
 bronx1<-bronx1[which(bronx1$SALE.PRICE>=minprice),]
 nval<-dim(bronx1)[1]
 
+library(gdata)
 bronx1$ADDRESSONLY<-gsub("[,][[:print:]]*","",gsub("[ ]+","",trim(bronx1$ADDRESS))) 
 bronxadd<-unique(data.frame(bronx1$ADDRESSONLY, bronx1$ZIP.CODE,stringsAsFactors=FALSE)) 
 names(bronxadd)<-c("ADDRESSONLY","ZIP.CODE") 
@@ -32,19 +33,28 @@ addsample<-bronxadd[sample.int(dim(bronxadd),size=nsample),]#I use nval here
 # may need to install this package
 library(ggmap)
 addrlist<-paste(addsample$ADDRESSONLY, "NY", addsample$ZIP.CODE, "US", sep=" ") 
+register_google(key="", write=TRUE)
 querylist<-geocode(addrlist) #This is cool. Take a break.
 
 matched<-(querylist$lat!=0 &&querylist$lon!=0) 
 addsample<-cbind(addsample,querylist$lat,querylist$lon) 
-names(addsample)<-c("ADDRESSONLY","ZIPCODE","Latitude","Longitude")# correct the column na adduse<-merge(bronx1,addsample)
+names(addsample)<-c("ADDRESSONLY","ZIPCODE","Latitude","Longitude")# correct the column na 
+adduse<-merge(bronx1,addsample)
 
 adduse<-adduse[!is.na(adduse$Latitude),]
-mapcoord<-adduse[,c(2,3,24,25)]
+
+mapcoord<-adduse[c(2,3,25,26)]
 
 table(mapcoord$NEIGHBORHOOD)
 
 mapcoord$NEIGHBORHOOD <- as.factor(mapcoord$NEIGHBORHOOD)
-map <- get_map(location = 'Bronx', zoom = 12)#Zoom 11 or 12
+location = array(c(mapcoord[1,]$Longitude,mapcoord[1,]$Latitude))
+register_google(key="", write=TRUE)
+# get_map(location = array(c(1,1)))
+# map <- get_map(location = 'Bronx', zoom = 12)#Zoom 11 or 12
+install.packages("devtools")
+devtools::install_github("dkahle/ggmap", ref = "tidyup", force=TRUE)
+map <- get_map(location = 'Bronx', zoom = 12)
 ggmap(map) + geom_point(aes(x = mapcoord$Longitude, y = mapcoord$Latitude, size =1, color=mapcoord$NEIGHBORHOOD), data = mapcoord) +theme(legend.position = "none") 
 
 #It would be perfect if I can decrease the size of points 
@@ -52,7 +62,7 @@ ggmap(map) + geom_point(aes(x = mapcoord$Longitude, y = mapcoord$Latitude, size 
 mapmeans<-cbind(adduse,as.numeric(mapcoord$NEIGHBORHOOD))
 colnames(mapmeans)[26] <- "NEIGHBORHOOD" #This is the right way of renaming.
 
-keeps <- c("ZIP.CODE","NEIGHBORHOOD","TOTAL.UNITS","LAND.SQUARE.FEET","GROSS.SQUARE.FEET","SALE.PRICE","Latitude","Longitude") 
+keeps <- c("ZIP.CODE","NEIGHBORHOOD","TOTAL.UNITS","LAND.SQUARE.FEET","GROSS.SQUARE.FEET","SALE.PRICE","Latitude") 
 mapmeans<-mapmeans[keeps]#Dropping others
 mapmeans$NEIGHBORHOOD<-as.numeric(mapcoord$NEIGHBORHOOD) 
 
@@ -61,7 +71,7 @@ for(i in 1:8){
 }#Now done for conversion to numeric
 
 #Classification
-mapcoord$class<as.numeric(mapcoord$NEIGHBORHOOD)
+mapcoord$class<-as.numeric(mapcoord$NEIGHBORHOOD)
 nclass<-dim(mapcoord)[1]
 split<-0.8
 trainid<-sample.int(nclass,floor(split*nclass))
@@ -73,6 +83,7 @@ testid<-(1:nclass)[-trainid]
 kmax<-10
 knnpred<-matrix(NA,ncol=kmax,nrow=length(testid))
 knntesterr<-rep(NA,times=kmax)
+library(class)
 for (i in 1:kmax){		# loop over k
   knnpred[,i]<-knn(mapcoord[trainid,3:4],mapcoord[testid,3:4],cl=mapcoord[trainid,2],k=i)
   knntesterr[i]<-sum(knnpred[,i]!=mapcoord[testid,2])/length(testid)
@@ -80,6 +91,8 @@ for (i in 1:kmax){		# loop over k
 knntesterr
 
 #Clustering
+na_cols <- c("BOROUGH","NEIGHBORHOOD","TAX.CLASS.AT.PRESENT","BLOCK","LOT","BUILDING")
+mapmeans <- mapmeans[!na_cols]
 mapobj<-kmeans(mapmeans,5, iter.max=10, nstart=5, algorithm = c("Hartigan-Wong", "Lloyd", "Forgy", "MacQueen"))
 fitted(mapobj,method=c("centers","classes"))
 mapobj$centers
