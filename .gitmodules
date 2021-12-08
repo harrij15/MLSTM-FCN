@@ -1,3 +1,9 @@
 [submodule "Project/MALSTM"]
 	path = Project/MALSTM
 	url = https://github.com/titu1994/MLSTM-FCN
+[submodule "MLSTM-FCN"]
+	path = MLSTM-FCN
+	url = https://github.com/harrij15/MLSTM-FCN
+[submodule "Project/MALSTM-FCN"]
+	path = Project/MALSTM-FCN
+	url = https://github.com/harrij15/MLSTM-FCN

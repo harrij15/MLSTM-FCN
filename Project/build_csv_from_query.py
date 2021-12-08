@@ -58,7 +58,7 @@ if __name__ == "__main__":
     y_train, y_test = np.array(y[:split_index+1]).astype(int), np.array(y[split_index+1:]).astype(int)
 
     # Save .npy files for MALSTM-FCN
-    path = "MLSTM-FCN/Data/CCHF/"
+    path = "MALSTM-FCN/data/CCHF/"
     np.save(path + "X_train.npy",X_train)
     np.save(path + "X_test.npy",X_test)
     np.save(path + "y_train.npy",y_train)
