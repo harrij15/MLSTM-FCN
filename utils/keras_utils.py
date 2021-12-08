@@ -14,10 +14,11 @@ warnings.simplefilter('ignore', category=DeprecationWarning)
 from keras.models import Model
 from keras.layers import Permute
 from keras.optimizers import Adam
-from keras.utils import to_categorical
+#from keras.utils import to_categorical
 from keras.preprocessing.sequence import pad_sequences
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from keras import backend as K
+import tensorflow as tf
 
 from utils.generic_utils import load_dataset_at, calculate_dataset_metrics, cutoff_choice, \
                                 cutoff_sequence
@@ -130,8 +131,8 @@ def train_model(model:Model, dataset_id, dataset_prefix, dataset_fold_id=None, e
 
     print("Class weights : ", class_weight)
 
-    y_train = to_categorical(y_train, len(np.unique(y_train)))
-    y_test = to_categorical(y_test, len(np.unique(y_test)))
+    y_train = tf.keras.utils.to_categorical(y_train, len(np.unique(y_train)))
+    y_test = tf.keras.utils.to_categorical(y_test, len(np.unique(y_test)))
 
     if is_timeseries:
         factor = 1. / np.cbrt(2)
@@ -183,9 +184,9 @@ def evaluate_model(model:Model, dataset_id, dataset_prefix, dataset_fold_id=None
 
     if not is_timeseries:
         X_test = pad_sequences(X_test, maxlen=MAX_NB_VARIABLES[dataset_id], padding='post', truncating='post')
-    y_test = to_categorical(y_test, len(np.unique(y_test)))
+    y_test = tf.keras.utils.to_categorical(y_test, len(np.unique(y_test)))
 
-    optm = Adam(lr=1e-3)
+    optm = adam_v2.Adam(lr=1e-3)
     model.compile(optimizer=optm, loss='categorical_crossentropy', metrics=['accuracy'])
 
     if dataset_fold_id is None:
@@ -237,9 +238,9 @@ def compute_average_gradient_norm(model:Model, dataset_id, dataset_fold_id=None,
         else:
             X_train, X_test = cutoff_sequence(X_train, X_test, choice, dataset_id, sequence_length)
 
-    y_train = to_categorical(y_train, len(np.unique(y_train)))
+    y_train = tf.keras.utils.to_categorical(y_train, len(np.unique(y_train)))
 
-    optm = Adam(lr=learning_rate)
+    optm = adam_v2.Adam(lr=learning_rate)
     model.compile(optimizer=optm, loss='categorical_crossentropy', metrics=['accuracy'])
 
     average_gradient = _average_gradient_norm(model, X_train, y_train, batch_size)

@@ -49,6 +49,7 @@ TRAIN_FILES = ['../data/arabic/', # 0
                '../data/WEASEL_MUSE_DATASETS/lp5/',  # 45
                '../data/WEASEL_MUSE_DATASETS/pendigits/',  # 46
                '../data/WEASEL_MUSE_DATASETS/shapes_random/',  # 47
+               '../data/CCHF/' # 48
                ]
 
 TEST_FILES = ['../data/arabic/', # 0
@@ -101,6 +102,7 @@ TEST_FILES = ['../data/arabic/', # 0
               '../data/WEASEL_MUSE_DATASETS/lp5/',  # 45
               '../data/WEASEL_MUSE_DATASETS/pendigits/',  # 46
               '../data/WEASEL_MUSE_DATASETS/shapes_random/',  # 47
+              '../data/CCHF/' # 48
 
               ]
 
@@ -154,7 +156,7 @@ MAX_NB_VARIABLES = [13,  # 0
                     6,  # 45
                     2, #46
                     2, #47
-
+                    2, #48
                     ]
 
 MAX_TIMESTEPS_LIST = [93,  # 0
@@ -207,7 +209,7 @@ MAX_TIMESTEPS_LIST = [93,  # 0
                       15, #45
                       8, #46
                       97, #47
-
+                      7, #48
                       ]
 
 
@@ -261,5 +263,5 @@ NB_CLASSES_LIST = [10, # 0
                    5, #45
                    10, #46
                    3,#47
-
+                   2,#48
                    ]

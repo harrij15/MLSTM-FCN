@@ -6,8 +6,9 @@ from keras import activations
 from keras import initializers
 from keras import regularizers
 from keras import constraints
-from keras.engine import Layer
-from keras.engine import InputSpec
+#from keras.engine import Layer
+import tensorflow as tf
+#from keras.engine import InputSpec
 from keras.legacy import interfaces
 from keras.layers import Recurrent
 
@@ -186,8 +187,8 @@ class AttentionLSTM(Recurrent):
         self.dropout = min(1., max(0., dropout))
         self.recurrent_dropout = min(1., max(0., recurrent_dropout))
         self.return_attention = return_attention
-        self.state_spec = [InputSpec(shape=(None, self.units)),
-                           InputSpec(shape=(None, self.units))]
+        self.state_spec = [tf.keras.layers.InputSpec(shape=(None, self.units)),
+                           tf.keras.layers.InputSpec(shape=(None, self.units))]
         self.implementation = implementation
 
     def build(self, input_shape):
@@ -197,7 +198,7 @@ class AttentionLSTM(Recurrent):
         batch_size = input_shape[0] if self.stateful else None
         self.timestep_dim = input_shape[1]
         self.input_dim = input_shape[2]
-        self.input_spec[0] = InputSpec(shape=(batch_size, None, self.input_dim))
+        self.input_spec[0] = tf.keras.layers.InputSpec(shape=(batch_size, None, self.input_dim))
 
         self.states = [None, None]
         if self.stateful:
