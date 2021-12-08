@@ -186,7 +186,7 @@ def evaluate_model(model:Model, dataset_id, dataset_prefix, dataset_fold_id=None
         X_test = pad_sequences(X_test, maxlen=MAX_NB_VARIABLES[dataset_id], padding='post', truncating='post')
     y_test = tf.keras.utils.to_categorical(y_test, len(np.unique(y_test)))
 
-    optm = adam_v2.Adam(lr=1e-3)
+    optm = Adam(lr=1e-3)
     model.compile(optimizer=optm, loss='categorical_crossentropy', metrics=['accuracy'])
 
     if dataset_fold_id is None:
@@ -240,7 +240,7 @@ def compute_average_gradient_norm(model:Model, dataset_id, dataset_fold_id=None,
 
     y_train = tf.keras.utils.to_categorical(y_train, len(np.unique(y_train)))
 
-    optm = adam_v2.Adam(lr=learning_rate)
+    optm = Adam(lr=learning_rate)
     model.compile(optimizer=optm, loss='categorical_crossentropy', metrics=['accuracy'])
 
     average_gradient = _average_gradient_norm(model, X_train, y_train, batch_size)
